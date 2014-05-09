@@ -1,4 +1,4 @@
-Start - Partlist
+Play - Partlist
 ================
 
 ## Passive
