@@ -4,9 +4,8 @@ OBJS = $(TARGET).o
 MCU = attiny85
 F_CPU = 8000000L
 
-AVRDUDE_PROGRAMMER = usbasp
-AVRDUDE_PORT = usp
-AVRDUDE_FLAGS = -p $(MCU) -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT)
+AVRDUDE_FLAGS_USBASP = -p $(MCU) -c usbasp -P usb
+AVRDUDE_FLAGS_ARDUINOISP = -p $(MCU) -c avrisp -P /dev/tty.usbserial-A700dZUb -b 19200
 
 HFUSE=0xDE
 LFUSE=0xE2
@@ -41,11 +40,17 @@ $(TARGET).elf: $(OBJS)
 %.hex: %.elf
 	$(OBJCOPY) -j .eeprom -j .text -j .data -O ihex $< $@
 
-flash: $(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U flash:w:$(TARGET).hex
+flash-usbasp: $(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS_USBASP) -U flash:w:$(TARGET).hex
 
-fuses:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m
+flash-arduinoisp: $(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS_ARDUINOISP) -U flash:w:$(TARGET).hex
+
+fuses-usbasp:
+	$(AVRDUDE) $(AVRDUDE_FLAGS_USBASP) -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m
+
+fuses-arduinoisp:
+	$(AVRDUDE) $(AVRDUDE_FLAGS_ARDUINOISP) -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m
 
 clean:
 	rm -f $(OBJS).o
