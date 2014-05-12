@@ -3202,7 +3202,6 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <parts>
 <part name="U$1" library="attiny85" deviceset="ATTINY85" device=""/>
 <part name="SUPPLY1" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="SUPPLY2" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="GND1" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="R1" library="SparkFun-Resistors" deviceset="RESISTOR" device="PTH-1/4W" value="1 kΩ">
 <attribute name="RESISTANCE" value="1 kΩ"/>
@@ -3232,8 +3231,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 </plain>
 <instances>
 <instance part="U$1" gate="G$1" x="38.1" y="40.64"/>
-<instance part="SUPPLY1" gate="G$1" x="66.04" y="58.42"/>
-<instance part="SUPPLY2" gate="G$1" x="66.04" y="58.42"/>
+<instance part="SUPPLY1" gate="G$1" x="66.04" y="63.5"/>
 <instance part="GND1" gate="1" x="38.1" y="33.02"/>
 <instance part="R1" gate="G$1" x="76.2" y="43.18">
 <attribute name="RESISTANCE" x="76.2" y="43.18" size="1.778" layer="96" display="off"/>
@@ -3262,17 +3260,17 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <nets>
 <net name="VCC" class="0">
 <segment>
-<pinref part="SUPPLY1" gate="G$1" pin="VCC"/>
-<pinref part="SUPPLY2" gate="G$1" pin="VCC"/>
-<pinref part="U$1" gate="G$1" pin="VCC"/>
-<wire x1="66.04" y1="50.8" x2="66.04" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="JP1" gate="G$1" pin="1"/>
+<pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
+<wire x1="50.8" y1="17.78" x2="48.26" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="17.78" x2="48.26" y2="25.4" width="0.1524" layer="91"/>
+</segment>
+<segment>
 <pinref part="U$1" gate="G$1" pin="PB5"/>
-<wire x1="66.04" y1="55.88" x2="66.04" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="38.1" y1="50.8" x2="38.1" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="38.1" y1="55.88" x2="66.04" y2="55.88" width="0.1524" layer="91"/>
-<junction x="66.04" y="55.88"/>
-<wire x1="66.04" y1="55.88" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="T1" gate="G$1" pin="C"/>
+<wire x1="66.04" y1="55.88" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="55.88" x2="96.52" y2="48.26" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="55.88" x2="114.3" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="LED1" gate="G$1" pin="A"/>
@@ -3290,12 +3288,11 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <wire x1="149.86" y1="55.88" x2="165.1" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="165.1" y1="55.88" x2="165.1" y2="33.02" width="0.1524" layer="91"/>
 <junction x="149.86" y="55.88"/>
-</segment>
-<segment>
-<pinref part="JP1" gate="G$1" pin="1"/>
-<pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
-<wire x1="50.8" y1="17.78" x2="48.26" y2="17.78" width="0.1524" layer="91"/>
-<wire x1="48.26" y1="17.78" x2="48.26" y2="25.4" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="VCC"/>
+<wire x1="66.04" y1="50.8" x2="66.04" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="SUPPLY1" gate="G$1" pin="VCC"/>
+<wire x1="66.04" y1="55.88" x2="66.04" y2="63.5" width="0.1524" layer="91"/>
+<junction x="66.04" y="55.88"/>
 </segment>
 </net>
 <net name="GND" class="0">
