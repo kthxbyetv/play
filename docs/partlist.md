@@ -27,4 +27,4 @@ Play - Partlist
 ## Misc
 
  * 1 x Start PCB
- * 35mm heatshrink tubing
+ * 25mm heatshrink tubing
