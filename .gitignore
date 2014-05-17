@@ -1,3 +1,9 @@
 *.b#*
 *.s#*
+*.hex
+*.o
+*.map
+*.elf
+*.d
+
 hardware/play.pro
