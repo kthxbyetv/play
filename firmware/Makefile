@@ -1,7 +1,7 @@
 TARGET = main
 OBJS = $(TARGET).o utils.o codes.o
 
-MCU = attiny85
+MCU = attiny45
 F_CPU = 8000000L
 
 AVRDUDE_FLAGS = -p $(MCU) -c usbasp -P usb

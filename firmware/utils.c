@@ -17,9 +17,9 @@
 #include "utils.h"
 
 void quickLEDFlash(void) {
-	PORTB &= ~(1 << ACT_LED);
-	delayTenMicroseconds(3000);
 	PORTB |= (1 << ACT_LED);
+	delayTenMicroseconds(3000);
+	PORTB &= ~(1 << ACT_LED);
 }
 
 void delayTenMicroseconds(uint16_t us) {
