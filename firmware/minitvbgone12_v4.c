@@ -18,7 +18,6 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include "a_v4.h"
-#include "util.h"
 
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
 extern const uint8_t num_NAcodes, num_EUcodes;
