@@ -17,6 +17,7 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+#include "hardware.h"
 #include "a_v4.h"
 
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
@@ -111,8 +112,6 @@ int main(void) {
 	PORTB = 0b00000110;
 
 	delay_ten_us(6000);
-
-	if (!bit_is_set(PINB,GRENADE)) setgrenade();
 
 	while(!bit_is_set(PINB,PB2)) {};
 	delay_ten_us(6000);

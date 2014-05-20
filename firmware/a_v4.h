@@ -1,8 +1,3 @@
-// What pins do what
-#define LED PB3
-#define IRLED PB0
-#define GRENADE PB1
-
 // Lets us calculate the size of the NA/EU databases
 #define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)));
 
