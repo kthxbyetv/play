@@ -95,48 +95,44 @@ void setgrenade(void) {
 }
 
 int main(void) {
-  uint16_t ontime, offtime;
-  uint8_t j,i,loopgrn;
+	// Variables initialisation
+	uint16_t ontime, offtime;
+	uint8_t j,i,loopgrn;
 
-  //TCCR1 = 0;		   	   // Turn off PWM/freq gen, should be off already
-  //TCCR0A = 0;
-  //TCCR0B = 0;
+	// Clearing watchdogs flags and disabling it
+	MCUSR = 0;
+	WDTCR = _BV(WDCE) | _BV(WDE);
+	WDTCR = 0;
 
-  MCUSR = 0;                     // clear watchdog flag
-  WDTCR = _BV(WDCE) | _BV(WDE);  // enable WDT disable
+	// Set ACT LED and IR LED pins as outputs
+	DDRB = _BV(LED) | _BV(IRLED);
 
-  WDTCR = 0;                     // disable WDT while we setup
+	// Set up a pullup on the pin which is connected to the button
+	PORTB = 0b00000110;
 
-  //GIMSK = 0;
-
-  DDRB = _BV(LED) | _BV(IRLED);  // set the visible and IR LED pins to outputs
-  PORTB = 0b00000110;			 // Pullup
-
-  delay_ten_us(6000);
-
-  if (!bit_is_set(PINB,GRENADE)) setgrenade();
-
-  while(!bit_is_set(PINB,PB2)) {};
 	delay_ten_us(6000);
 
-  for (i=0;i<255;i++) {
-	delay_ten_us(300);
-	if (!bit_is_set(PINB,PB2)) {
-		setgrenade();
-		break;
+	if (!bit_is_set(PINB,GRENADE)) setgrenade();
+
+	while(!bit_is_set(PINB,PB2)) {};
+	delay_ten_us(6000);
+
+	for (i=0;i<255;i++) {
+		delay_ten_us(300);
+		if (!bit_is_set(PINB,PB2)) {
+			setgrenade();
+			break;
+		}
 	}
-  }
 
-  GIMSK = _BV(INT0);
+	// Set an interrupt on INT0 (which is PB2)
+	GIMSK = _BV(INT0);
 
-  //delay_ten_us(5000);            // Let everything settle for a bit
-  
-  
-  // turn on watchdog timer immediately, this protects against
-  // a 'stuck' system by resetting it
-  wdt_enable(WDTO_8S); // 1 second long timeout
+	// Turn on the watchdog with a 1 second long timeout
+	wdt_enable(WDTO_8S);
 
-	  sei();
+	// Turn on interrupts
+	sei();
 
 for (;;) {
 
