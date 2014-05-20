@@ -76,8 +76,11 @@ uint8_t read_bits(uint8_t count)
 }
 
 ISR(INT0_vect) {
-  wdt_enable(WDTO_15MS); // 1 second long timeout
-	  for(;;) {} // Watchdog lol
+	// To reset the AVR without relying on hardware,
+	// we enable the watchdog then launch an endless loop
+	// so that the watchdog will detect it and reset the AVR
+	wdt_enable(WDTO_15MS);
+	for(;;) {}
 }
 
 void setgrenade(void) {
