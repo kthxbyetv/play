@@ -14,7 +14,7 @@ TARGET = minitvbgone14
 OPT = s
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = minitvbgone12_v4.c EUcodes-v4.c
+SRC = minitvbgone12_v4.c codes.c
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
