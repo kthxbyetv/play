@@ -1,14 +1,20 @@
 /*
-µTVBG Firmware V0.8
-For use with ATtiny45v and v4 hardware
-(c) Mitch Altman + Limor Fried + Furrtek 2011
-With some code from Kevin Timmerman & Damien Good 7-Dec-07
-Distributed under Creative Commons 2.5 -- Attib & Share Alike
+kthxbyetv (play) firmware
+coded by kthxbyetv team
+
+based on the code of :
+* Mitch Altman
+* Limor Fried
+* Kevin Timmerman
+* Damien Good
+* Furrtek
+
+distributed under Creative Commons 2.5 -- Attib & Share Alike
 */
 
-#include <avr/io.h>             // this contains all the IO port definitions
-#include <avr/sleep.h>          // definitions for power-down modes
-#include <avr/pgmspace.h>       // definitions or keeping constants in program memory
+#include <avr/io.h>
+#include <avr/sleep.h>
+#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include "a_v4.h"
