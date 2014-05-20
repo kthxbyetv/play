@@ -8,5 +8,6 @@
 *.eep
 *.lst
 *.sym
+*.lss
 
 hardware/play.pro
