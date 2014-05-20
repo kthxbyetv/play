@@ -1,10 +1,20 @@
+/*
+kthxbyetv (play) firmware
+coded by kthxbyetv team
+
+based on the code of :
+* Mitch Altman
+* Limor Fried
+* Kevin Timmerman
+* Damien Good
+* Furrtek
+
+distributed under Creative Commons 2.5 -- Attib & Share Alike
+*/
+
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include "main.h"
-
-//Codes captured from Generation 3 TV-B-Gone by Limor Fried & Mitch Altman
-//table of POWER codes
-//(0.91) Additionnal codes by furrtek & Scruffy (0.7 + Megazone + TNT (0.8) + VP Hitachi)
 
 const uint16_t code_HitachiVPTimes[] PROGMEM = {
 900,460,
@@ -60,36 +70,6 @@ const struct IrCode code_TNT1Code PROGMEM = {
 	{
 		0x15,0x55,0xAA,0xAA,0x69,0x55,0x56,0xAA,0xB0
 	}
-};
-
-const uint16_t code_MGZTimes[] PROGMEM = {
-        110,29,
-        54,29,
-        29,29,
-        54,0
-
-		// H 01000000 11100000 00000000 11100111
-		// 0 21222222 11122222 22222222 11122113
-
-		// 00100110 26
-		// 10101010 AA
-		// 10010101 95
-		// 10101010 AA
-		// 10101010 AA
-		// 10101010 AA
-		// 10010101 95
-		// 10100101 A5
-		// 11000000 C0
-};
-
-const struct IrCode code_MGZCode PROGMEM = {
-        freq_to_timerval(56000),
-        33,             // # of pairs
-        2,              // # of bits per index
-        code_MGZTimes,
-        {
-			0x26,0xAA,0x95,0xAA,0xAA,0xAA,0x95,0xA5,0xC0
-        }
 };
 
 const uint16_t code_CAE33Times[] PROGMEM = {
@@ -2746,7 +2726,6 @@ const struct IrCode code_eu059Code PROGMEM = {
 };// Duplicate IR Code? - Similar to EU056
 
 const struct IrCode * const EUpowerCodes[] PROGMEM = {
-	&code_MGZCode,
 	&code_epsonCode,
     &code_eu000Code,
 	&code_HitachiVPCode,
@@ -2754,16 +2733,15 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_eu001Code,
 	&code_eu002Code,
 	&code_epsonCode,
-	&code_na000Code, // same as &code_eu003Code
+	&code_na000Code,
 	&code_HitachiVPCode,
 	&code_eu004Code,
 	&code_eu005Code,
 	&code_eu006Code,
 	&code_eu007Code,
 	&code_eu008Code,
-	&code_na005Code, // same as &code_eu009Code
-	&code_na004Code, // same as &code_eu010Code
-
+	&code_na005Code,
+	&code_na004Code,
 	&code_CAE33Code,
 	&code_SX263UCode,
 	&code_V718UCode,
@@ -2773,11 +2751,10 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_N2QAYB000239Code,
 	&code_RC8861Code,
 	&code_RD427ECode,
-
 	&code_eu011Code,
 	&code_eu012Code,
 	&code_eu013Code,
-	&code_na021Code, // same as &code_eu014Code
+	&code_na021Code,
 	&code_eu015Code,
 	&code_eu016Code,
 	&code_eu017Code,
@@ -2786,7 +2763,7 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_eu020Code,
 	&code_eu021Code,
 	&code_eu022Code,
-	&code_na022Code, // same as &code_eu023Code
+	&code_na022Code,
 	&code_eu024Code,
 	&code_eu025Code,
 	&code_eu026Code,
@@ -2798,7 +2775,6 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_eu032Code,
 	&code_eu033Code,
 	&code_eu034Code,
-	//&code_eu035Code, same as eu009
 	&code_eu036Code,
 	&code_eu037Code,
 	&code_eu038Code,
@@ -2818,7 +2794,6 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_eu052Code,
 	&code_eu053Code,
 	&code_eu054Code,
-	//&code_eu057Code, same as eu008
 	&code_eu058Code,
 	&code_eu059Code,
 };
