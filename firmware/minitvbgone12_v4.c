@@ -241,28 +241,23 @@ for (;;) {
 // in main.h Unless you are changing the crystal from 8mhz, dont
 // mess with this.
 void delay_ten_us(uint16_t us) {
-  uint8_t timer;
-  while (us != 0) {
-    // for 8MHz we want to delay 80 cycles per 10 microseconds
-    // this code is tweaked to give about that amount.
-    for (timer=0; timer <= DELAY_CNT; timer++) {
-      NOP;
-      NOP;
-    }
-    NOP;
-    us--;
-  }
+	uint8_t timer;
+	while (us != 0) {
+		for (timer=0; timer <= DELAY_CNT; timer++) {
+			NOP;
+			NOP;
+		}
+		NOP;
+		us--;
+	}
 }
 
-// This function just flashes the visible LED a couple times, used to
-// tell the user what region is selected
 void quickflashLEDx( uint8_t x ) {
-  while(x--) {
-	delay_ten_us(15000);     // 150 millisec delay between flahes
-  PORTB |= _BV(LED);   // turn on visible LED at PB0 by pulling pin to ground
-  delay_ten_us(1000);   // 30 millisec delay
-  PORTB &=~ _BV(LED);    // turn off visible LED at PB0 by pulling pin to +3V
-  	wdt_reset();
-  }
-  //wdt_reset();                // kick the dog
+	while(x--) {
+		delay_ten_us(15000);
+		PORTB |= _BV(LED);
+		delay_ten_us(1000);
+		PORTB &=~ _BV(LED);
+		wdt_reset();
+	}
 }
