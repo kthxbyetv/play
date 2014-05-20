@@ -23,26 +23,28 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
 extern const uint8_t num_NAcodes, num_EUcodes;
 
-void xmitCodeElement(uint16_t ontime, uint16_t offtime, uint8_t PWM_code )
-{
-  TCNT0 = 0; // reset the timers so they are aligned
-  TIFR = 0;  // clean out the timer flags
+void xmitCodeElement(uint16_t on_time, uint16_t off_time, uint8_t is_pwm) {
+	// Reset the timers so they are aligned + clean timer flags
+	TCNT0 = 0;
+	TIFR = 0;
 
-  if(PWM_code) {
-    TCCR0A =_BV(COM0A0) | _BV(WGM01);          // Set up timer 0
-    TCCR0B = _BV(CS00);
-  } else {
-    PORTB |= _BV(IRLED);
-  }
+	if(is_pwm) {
+		// Turn on PWM timer
+		TCCR0A =_BV(COM0A0) | _BV(WGM01);
+		TCCR0B = _BV(CS00);
+	} else {
+		PORTB |= _BV(IRLED);
+	}
+	
+	delay_ten_us(on_time);
 
-  delay_ten_us(ontime);
+	// Turn off PWM timer
+	TCCR0A = 0;
+	TCCR0B = 0;
+	
+	PORTB &= ~_BV(IRLED);
 
-  TCCR0A = 0;
-  TCCR0B = 0;
-  PORTB &= ~_BV(IRLED);           // turn off IR LED 2N2222
-  //PORTB |= _BV(IRLED); 
-
-  delay_ten_us(offtime);
+	delay_ten_us(off_time);
 }
 
 uint8_t bitsleft_r = 0;
