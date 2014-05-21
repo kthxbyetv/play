@@ -21,7 +21,7 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include "utils.h"
 
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
-extern const uint8_t num_NAcodes, num_EUcodes;
+extern const uint8_t num_EUcodes;
 
 uint8_t bitsleft_r = 0;
 uint8_t bits_r=0,grenade=0;
