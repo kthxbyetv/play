@@ -86,7 +86,7 @@ ISR(INT0_vect) {
 int main(void) {
 	// Variables initialisation
 	uint16_t ontime, offtime;
-	uint8_t j,i,loopgrn;
+	uint8_t i,loopgrn;
 
 	// Clearing watchdogs flags and disabling it
 	MCUSR = 0;
@@ -111,66 +111,54 @@ int main(void) {
 	sei();
 
 	for (;;) {
-		for(loopgrn=0;loopgrn<grenade+1;loopgrn++) {
-			j = num_EUcodes;
+		for(i=0 ; i < num_EUcodes; i++) {
+			// Reset our watchdog timer, so it won't reset the AVR while sending a code
+			wdt_reset();
 
-			for(i=0 ; i < j; i++) {
-				// Reset our watchdog timer, so it won't reset the AVR while sending a code
-				wdt_reset();
+			// Getting the address of our code
+			code_ptr = (PGM_P)pgm_read_word(EUpowerCodes+i);
 
-				// Getting the address of our code
-				code_ptr = (PGM_P)pgm_read_word(EUpowerCodes+i);
-
-				// Read the carrier frequency
-				const uint8_t freq = pgm_read_byte(code_ptr++);
+			// Read the carrier frequency
+			const uint8_t freq = pgm_read_byte(code_ptr++);
 				
-				// set OCR for Timer1 to output this code's carrier frequency
-				OCR0A = freq; 
+			// set OCR for Timer1 to output this code's carrier frequency
+			OCR0A = freq; 
 
-				// Get the number of pairs
-				const uint8_t numpairs = pgm_read_byte(code_ptr++);
+			// Get the number of pairs
+			const uint8_t numpairs = pgm_read_byte(code_ptr++);
 
-				// Get the number of bits we use to index into the timer table
-				const uint8_t bitcompression = pgm_read_byte(code_ptr++);
+			// Get the number of bits we use to index into the timer table
+			const uint8_t bitcompression = pgm_read_byte(code_ptr++);
 
-				// Get pointer (address in memory) to pulse-times table
-				const PGM_P time_ptr = (PGM_P)pgm_read_word(code_ptr);
-				code_ptr+=2;
+			// Get pointer (address in memory) to pulse-times table
+			const PGM_P time_ptr = (PGM_P)pgm_read_word(code_ptr);
+			code_ptr+=2;
 
-				for (uint8_t k=0; k<numpairs; k++) {
-					uint8_t ti;
+			for (uint8_t k=0; k<numpairs; k++) {
+				uint8_t ti;
 
-					// Read the next 'n' bits as indicated by the compression variable
-					// The multiply by 4 because there are 2 timing numbers per pair
-					// and each timing number is one word long, so 4 bytes total!
-					ti = (read_bits(bitcompression)) * 4;
+				// Read the next 'n' bits as indicated by the compression variable
+				// The multiply by 4 because there are 2 timing numbers per pair
+				// and each timing number is one word long, so 4 bytes total!
+				ti = (read_bits(bitcompression)) * 4;
 
-					// read the onTime and offTime from the program memory
-					ontime = pgm_read_word(time_ptr+ti);  // read word 1 - ontime
-					offtime = pgm_read_word(time_ptr+ti+2);  // read word 2 - offtime
+				// read the onTime and offTime from the program memory
+				ontime = pgm_read_word(time_ptr+ti);  // read word 1 - ontime
+				offtime = pgm_read_word(time_ptr+ti+2);  // read word 2 - offtime
 
-					// transmit this codeElement (ontime and offtime)
-					xmitCodeElement(ontime, offtime, (freq!=0));  
-				}
-
-				//Flush remaining bits, so that next code starts
-				//with a fresh set of 8 bits.
-				bitsleft_r=0;	
-
-				// delay 250 milliseconds before transmitting next POWER code
-				delay_ten_us(25000);
-
-				// visible indication that a code has been output.
-				if (!grenade) quickflashLEDx(1); 
+				// transmit this codeElement (ontime and offtime)
+				xmitCodeElement(ontime, offtime, (freq!=0));  
 			}
-			
-			if (grenade) {
-				PORTB = 0b00000110;	// Pullup
-				for (i=0;i<44;i++) {
-					delay_ten_us(65500); // 29s
-					wdt_reset();
-				}
-			}
+
+			//Flush remaining bits, so that next code starts
+			//with a fresh set of 8 bits.
+			bitsleft_r=0;	
+
+			// delay 250 milliseconds before transmitting next POWER code
+			delay_ten_us(25000);
+
+			// visible indication that a code has been output.
+			quickflashLEDx(1); 
 		}  
 
 		// We are done, no need for a watchdog timer anymore
