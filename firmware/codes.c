@@ -16,10 +16,6 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/pgmspace.h>
 #include "codes.h"
 
-const uint16_t code_AppleRemote[] PROGMEM = {
-	
-};
-
 const uint16_t code_HitachiVPTimes[] PROGMEM = {
 	900,460,
 	63,173,
