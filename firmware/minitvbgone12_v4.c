@@ -83,18 +83,6 @@ ISR(INT0_vect) {
 	for(;;) {}
 }
 
-void setgrenade(void) {
-	uint8_t i;
-  	grenade=9;
-	quickflashLEDx(5);
-  GIMSK = _BV(INT0);
-	  sei();
-			for (i=0;i<15;i++) {
-			  delay_ten_us(65500); // 10s
-			  wdt_reset();
-		    }
-}
-
 int main(void) {
 	// Variables initialisation
 	uint16_t ontime, offtime;
@@ -113,17 +101,6 @@ int main(void) {
 
 	delay_ten_us(6000);
 
-	while(!bit_is_set(PINB,PB2)) {};
-	delay_ten_us(6000);
-
-	for (i=0;i<255;i++) {
-		delay_ten_us(300);
-		if (!bit_is_set(PINB,PB2)) {
-			setgrenade();
-			break;
-		}
-	}
-
 	// Set an interrupt on INT0 (which is PB2)
 	GIMSK = _BV(INT0);
 
@@ -136,8 +113,6 @@ int main(void) {
 	for (;;) {
 		for(loopgrn=0;loopgrn<grenade+1;loopgrn++) {
 			j = num_EUcodes;
-
-			if (grenade) quickflashLEDx(5);
 
 			for(i=0 ; i < j; i++) {
 				// Reset our watchdog timer, so it won't reset the AVR while sending a code
