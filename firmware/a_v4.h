@@ -1,17 +1,6 @@
 // Lets us calculate the size of the NA/EU databases
 #define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)));
 
-// set define to 0 to turn off debug output
-#define DEBUG 0
-#define DEBUGP(x) if (DEBUG == 1) { x ; }
-
-
-// Shortcut to insert single, non-optimized-out nop
-#define NOP __asm__ __volatile__ ("nop")
-
-// Tweak this if neccessary to change timing
-#define DELAY_CNT 11
-
 // Makes the codes more readable. the OCRA is actually
 // programmed in terms of 'periods' not 'freqs' - that
 // is, the inverse!
