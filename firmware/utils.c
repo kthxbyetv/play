@@ -38,3 +38,27 @@ void delay_ten_us(uint16_t us) {
 		us--;
 	}
 }
+
+void xmitCodeElement(uint16_t on_time, uint16_t off_time, uint8_t is_pwm) {
+	// Reset the timers so they are aligned + clean timer flags
+	TCNT0 = 0;
+	TIFR = 0;
+
+	if(is_pwm) {
+		// Turn on PWM timer
+		TCCR0A =_BV(COM0A0) | _BV(WGM01);
+		TCCR0B = _BV(CS00);
+	} else {
+		PORTB |= _BV(IRLED);
+	}
+	
+	delay_ten_us(on_time);
+
+	// Turn off PWM timer
+	TCCR0A = 0;
+	TCCR0B = 0;
+	
+	PORTB &= ~_BV(IRLED);
+
+	delay_ten_us(off_time);
+}

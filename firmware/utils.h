@@ -20,3 +20,4 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 
 void blinkLED(uint8_t count);
 void delay_ten_us(uint16_t us);
+void xmitCodeElement(uint16_t on_time, uint16_t off_time, uint8_t is_pwm);

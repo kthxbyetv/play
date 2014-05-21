@@ -23,56 +23,34 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
 extern const uint8_t num_NAcodes, num_EUcodes;
 
-void xmitCodeElement(uint16_t on_time, uint16_t off_time, uint8_t is_pwm) {
-	// Reset the timers so they are aligned + clean timer flags
-	TCNT0 = 0;
-	TIFR = 0;
-
-	if(is_pwm) {
-		// Turn on PWM timer
-		TCCR0A =_BV(COM0A0) | _BV(WGM01);
-		TCCR0B = _BV(CS00);
-	} else {
-		PORTB |= _BV(IRLED);
-	}
-	
-	delay_ten_us(on_time);
-
-	// Turn off PWM timer
-	TCCR0A = 0;
-	TCCR0B = 0;
-	
-	PORTB &= ~_BV(IRLED);
-
-	delay_ten_us(off_time);
-}
-
 uint8_t bitsleft_r = 0;
 uint8_t bits_r=0,grenade=0;
 PGM_P code_ptr;
 
-// we cant read more than 8 bits at a time so dont try!
-uint8_t read_bits(uint8_t count)
-{
-  uint8_t i;
-  uint8_t tmp=0;
+uint8_t read_bits(uint8_t count) {
+	uint8_t i;
+	uint8_t tmp=0;
   
-  // we need to read back count bytes
-  for (i=0; i<count; i++) {
-    // check if the 8-bit buffer we have has run out
-    if (bitsleft_r == 0) {
-      // in which case we read a new byte in
-      bits_r = pgm_read_byte(code_ptr++);
-      // and reset the buffer size (8 bites in a byte)
-      bitsleft_r = 8;
-    }
-    // remove one bit
-    bitsleft_r--;
-    // and shift it off of the end of 'bits_r'
-    tmp |= (((bits_r >> (bitsleft_r)) & 1) << (count-1-i));
-  }
-  // return the selected bits in the LSB part of tmp
-  return tmp; 
+	// we need to read back count bytes
+	for (i=0; i<count; i++) {
+		// check if the 8-bit buffer we have has run out
+		if (bitsleft_r == 0) {
+			// in which case we read a new byte in
+			bits_r = pgm_read_byte(code_ptr++);
+	
+			// and reset the buffer size (8 bites in a byte)
+			bitsleft_r = 8;
+		}
+		
+		// remove one bit
+		bitsleft_r--;
+		
+		// and shift it off of the end of 'bits_r'
+		tmp |= (((bits_r >> (bitsleft_r)) & 1) << (count-1-i));
+	}
+	
+	// return the selected bits in the LSB part of tmp
+	return tmp; 
 }
 
 ISR(INT0_vect) {
