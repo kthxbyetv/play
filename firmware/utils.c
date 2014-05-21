@@ -14,6 +14,7 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 
 #include <avr/io.h>
 #include <avr/wdt.h>
+#include <util/delay.h>
 #include "hardware.h"
 #include "utils.h"
 

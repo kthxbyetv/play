@@ -16,33 +16,16 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/pgmspace.h>
 #include "codes.h"
 
-const uint16_t code_HitachiVPTimes[] PROGMEM = {
-900,460,
-63,173,
-63,63,
-63,0
+const uint16_t code_AppleRemote[] PROGMEM = {
+	
 };
 
-//A: 9ms,4.6ms
-//1: 0.63ms,1.73ms
-//0: 0.63ms,0.63ms
-//B: 0.63,0
-
-//A 11100001101000101110100000010111 B
-
-//0111222211 2122212111 2122222212 1113
-
-/*
-00010101:15
-10101010:AA
-01011001:59
-10101001:A9
-10010101:95
-10011010:9A
-10101010:AA
-01100101:65
-01110000:70
-*/
+const uint16_t code_HitachiVPTimes[] PROGMEM = {
+	900,460,
+	63,173,
+	63,63,
+	63,0
+};
 
 const struct IrCode code_HitachiVPCode PROGMEM = {
 	freq_to_timerval(38000),
@@ -56,10 +39,10 @@ const struct IrCode code_HitachiVPCode PROGMEM = {
 
 
 const uint16_t code_TNT1Times[] PROGMEM = {
-896,448,
-56,56,
-56,168,
-56,0
+	896,448,
+	56,56,
+	56,168,
+	56,0
 };
 
 const struct IrCode code_TNT1Code PROGMEM = {
@@ -73,73 +56,83 @@ const struct IrCode code_TNT1Code PROGMEM = {
 };
 
 const uint16_t code_CAE33Times[] PROGMEM = {
-        860,406,
-        66,145,
-        66,40,
-        66,2100
+	860,406,
+	66,145,
+	66,40,
+	66,2100
 };
 const struct IrCode code_CAE33Code PROGMEM = {
-        freq_to_timerval(38000),
-        35,             // # of pairs
-        2,              // # of bits per index
-        code_CAE33Times,
-        {
-                0x5A,
-                0x99,
-                0x56,
-                0x6A,
-                0xD6,
-                0xA6,
-                0x55,
-				0x9A,
-				0xB0
-        }
+	freq_to_timerval(38000),
+	35,             // # of pairs
+	2,              // # of bits per index
+	code_CAE33Times,
+	{
+	        0x5A,
+	        0x99,
+	        0x56,
+	        0x6A,
+	        0xD6,
+	        0xA6,
+	        0x55,
+			0x9A,
+			0xB0
+	}
 };
 
 const uint16_t code_SX263UTimes[] PROGMEM = {
-        839,425,
-        49,161,
-        49,57,
-        49,2260
+	839,425,
+	49,161,
+	49,57,
+	49,2260
 };
 const struct IrCode code_SX263UCode PROGMEM = {
-        freq_to_timerval(38000),
-        52,             // # of pairs
-        2,              // # of bits per index
-        code_SX263UTimes,
-        {
-				0x16,
-				0x96,
-				0x6A,
-				0xA9,
-				0xB5,
-				0xA5,
-				0x9A,
-				0xAA,
-				0x6D,
-				0x69,
-				0x66,
-				0xAA,
-				0x9B
-		// 00010110100101100110101010101001101101011010010110011010101010100110110101101001011001101010101010011011
-        }
+	freq_to_timerval(38000),
+	52,             // # of pairs
+	2,              // # of bits per index
+	code_SX263UTimes,
+	{
+			0x16,
+			0x96,
+			0x6A,
+			0xA9,
+			0xB5,
+			0xA5,
+			0x9A,
+			0xAA,
+			0x6D,
+			0x69,
+			0x66,
+			0xAA,
+			0x9B
+	}
 };
 
 const uint16_t code_V718UTimes[] PROGMEM = {
-        840,422,
-        51,160,
-        51,54,
-        51,1940
+	840,422,
+	51,160,
+	51,54,
+	51,1940
 };
 const struct IrCode code_V718UCode PROGMEM = {
-        freq_to_timerval(38000),
-        52,             // # of pairs
-        2,              // # of bits per index
-        code_V718UTimes,
-        {
-			0x16,0x99,0x5A,0x59,0xB5,0xA6,0x56,0x96,0x6D,0x69,0x95,0xA5,0x9B
-		// 00010110100110010101101001011001101101011010011001010110100101100110110101101001100101011010010110011011
-		}
+	freq_to_timerval(38000),
+	52,             // # of pairs
+	2,              // # of bits per index
+	code_V718UTimes,
+	{
+		0x16,
+		0x99,
+		0x5A,
+		0x59,
+		0xB5,
+		0xA6,
+		0x56,
+		0x96,
+		0x6D,
+		0x69,
+		0x95,
+		0xA5,
+		0x9B
+	}
 };
 
 const uint16_t code_S33Times[] PROGMEM = {
