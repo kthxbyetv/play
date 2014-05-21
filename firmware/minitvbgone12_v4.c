@@ -18,6 +18,7 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include "hardware.h"
+#include "utils.h"
 #include "a_v4.h"
 
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
@@ -158,14 +159,14 @@ int main(void) {
 			delay_ten_us(25000);
 
 			// visible indication that a code has been output.
-			quickflashLEDx(1); 
+			blinkLED(1); 
 		}  
 
 		// We are done, no need for a watchdog timer anymore
 		wdt_disable();
 
 		// flash the visible LED on PB0  4 times to indicate that we're done
-		quickflashLEDx(10);
+		blinkLED(10);
 
 		// Shut down the timer
 		TCCR0A = 0;
@@ -186,36 +187,5 @@ int main(void) {
 		// Reset the AVR when it wakes up
 		wdt_enable(WDTO_15MS);
 		for(;;) {}
-	}
-}
-
-
-
-/****************************** LED AND DELAY FUNCTIONS ********/
-
-
-// This function delays the specified number of 10 microseconds
-// it is 'hardcoded' and is calibrated by adjusting DELAY_CNT 
-// in main.h Unless you are changing the crystal from 8mhz, dont
-// mess with this.
-void delay_ten_us(uint16_t us) {
-	uint8_t timer;
-	while (us != 0) {
-		for (timer=0; timer <= DELAY_CNT; timer++) {
-			NOP;
-			NOP;
-		}
-		NOP;
-		us--;
-	}
-}
-
-void quickflashLEDx( uint8_t x ) {
-	while(x--) {
-		delay_ten_us(15000);
-		PORTB |= _BV(LED);
-		delay_ten_us(1000);
-		PORTB &=~ _BV(LED);
-		wdt_reset();
 	}
 }

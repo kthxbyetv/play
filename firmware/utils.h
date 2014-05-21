@@ -12,10 +12,11 @@ based on the code of :
 distributed under Creative Commons 2.5 -- Attib & Share Alike
 */
 
-#include <avr/io.h>
+// NOP assembly function
+#define NOP __asm__ __volatile__ ("nop")
 
-// ACT LED : the LED that blinks when a code is sended
-#define LED PB3
+// Timing value used for the microseconds delay function
+#define DELAY_CNT 11
 
-// IR LED : the LEDs that sends the IR codes
-#define IRLED PB0
+void blinkLED(uint8_t count);
+void delay_ten_us(uint16_t us);

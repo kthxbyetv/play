@@ -12,7 +12,7 @@ TARGET = play
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 OPT = s
 
-SRC = minitvbgone12_v4.c codes.c
+SRC = minitvbgone12_v4.c codes.c utils.c
 
 # Compilation flags
 CFLAGS = -g -O$(OPT) \
