@@ -14,7 +14,7 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include "main.h"
+#include "codes.h"
 
 const uint16_t code_HitachiVPTimes[] PROGMEM = {
 900,460,

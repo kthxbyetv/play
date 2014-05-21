@@ -19,7 +19,6 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include <avr/interrupt.h>
 #include "hardware.h"
 #include "utils.h"
-#include "a_v4.h"
 
 extern const PGM_P * const EUpowerCodes[] PROGMEM;
 extern const uint8_t num_NAcodes, num_EUcodes;
@@ -98,7 +97,7 @@ int main(void) {
 	DDRB = _BV(LED) | _BV(IRLED);
 
 	// Set up a pullup on the pin which is connected to the button
-	PORTB = 0b00000110;
+	PORTB = _BV(BUTTON);
 
 	delay_ten_us(6000);
 

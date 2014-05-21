@@ -19,3 +19,6 @@ distributed under Creative Commons 2.5 -- Attib & Share Alike
 
 // IR LED : the LEDs that sends the IR codes
 #define IRLED PB0
+
+// Button : the one that you push to send the codes
+#define BUTTON PB2
