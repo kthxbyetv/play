@@ -31,7 +31,7 @@ void blinkLED(uint8_t count) {
 void delay_ten_us(uint16_t us) {
 	uint8_t timer;
 	while (us != 0) {
-		for (timer=0; timer <= DELAY_CNT; timer++) {
+		for (timer = 0; timer <= DELAY_CNT; timer++) {
 			NOP;
 			NOP;
 		}
@@ -52,13 +52,13 @@ void xmitCodeElement(uint16_t on_time, uint16_t off_time, uint8_t is_pwm) {
 	} else {
 		PORTB |= _BV(IRLED);
 	}
-	
+
 	delay_ten_us(on_time);
 
 	// Turn off PWM timer
 	TCCR0A = 0;
 	TCCR0B = 0;
-	
+
 	PORTB &= ~_BV(IRLED);
 
 	delay_ten_us(off_time);
