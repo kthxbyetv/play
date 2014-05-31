@@ -22,4 +22,4 @@ struct IrCode {
 
 // Macros
 #define freq_to_timerval(x) ((F_CPU / x - 1)/ 2)
-#define NUM_ELEM(x) (sizeof (x) / sizeof (*(x)));
+#define NUM_ELEM(x) (sizeof(x) / sizeof(*(x)));

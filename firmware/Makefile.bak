@@ -3,7 +3,7 @@ MCU = attiny45
 F_CPU = 8000000
 
 # Output format. (can be srec, ihex, binary)
-FORMAT = ihex
+FORMAT = ihex 
 
 # Target file name (without extension).
 TARGET = play
@@ -12,16 +12,20 @@ TARGET = play
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 OPT = s
 
-SRC = main.c
+SRC = main.c codes.c utils.c
 
 # Compilation flags
-CFLAGS = -O$(OPT) \
+CFLAGS = -g -O$(OPT) \
 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
 -Wall -Wstrict-prototypes \
 -DF_CPU=$(F_CPU) \
+-Wa,-adhlns=$(<:.c=.lst) \
+$(patsubst %,-I%,$(EXTRAINCDIRS)) \
 -std=gnu99
 
-LDFLAGS =
+ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs 
+LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
+LDFLAGS += -lm
 
 # Avrdude settings
 AVRDUDE_PROGRAMMER = usbasp
@@ -41,6 +45,7 @@ DIRLIB = $(DIRAVR)/avr/lib
 SHELL = sh
 CC = avr-gcc
 OBJCOPY = avr-objcopy
+OBJDUMP = avr-objdump
 SIZE = avr-size
 
 # Programming support using avrdude.
@@ -57,7 +62,7 @@ ELFSIZE = $(SIZE) -A $(TARGET).elf
 MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = -------- begin --------
 MSG_END = --------  end  --------
-MSG_SIZE_BEFORE = Size before:
+MSG_SIZE_BEFORE = Size before: 
 MSG_SIZE_AFTER = Size after:
 MSG_COFF = Converting to AVR COFF:
 MSG_EXTENDED_COFF = Converting to AVR Extended COFF:
@@ -70,12 +75,20 @@ MSG_COMPILING = Compiling:
 MSG_ASSEMBLING = Assembling:
 MSG_CLEANING = Cleaning project:
 
+# Define all object files.
+OBJ = $(SRC:.c=.o) $(ASRC:.S=.o) 
+
+# Define all listing files.
+LST = $(ASRC:.S=.lst) $(SRC:.c=.lst)
+
 # Combine all necessary flags and optional flags.
 # Add target processor to flags.
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS)
+ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 # Default target.
-all: begin gccversion sizebefore $(TARGET).elf $(TARGET).hex sizeafter finished end
+all: begin gccversion sizebefore $(TARGET).elf $(TARGET).hex $(TARGET).eep \
+	$(TARGET).lss $(TARGET).sym sizeafter finished end
 
 # Eye candy.
 # AVR Studio 3.x does not check make's exit code but relies on
@@ -99,7 +112,7 @@ sizeafter:
 	@if [ -f $(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
 
 # Display compiler version information.
-gccversion :
+gccversion : 
 	@$(CC) --version
 
 # Convert ELF to COFF for use in debugging / simulating in
@@ -108,7 +121,7 @@ COFFCONVERT=$(OBJCOPY) --debugging \
 	--change-section-address .data-0x800000 \
 	--change-section-address .bss-0x800000 \
 	--change-section-address .noinit-0x800000 \
-	--change-section-address .eeprom-0x810000
+	--change-section-address .eeprom-0x810000 
 
 coff: $(TARGET).elf
 	@echo
@@ -141,7 +154,7 @@ read-fuse:
 %.hex: %.elf
 	@echo
 	@echo $(MSG_FLASH) $@
-	$(OBJCOPY) -O $(FORMAT) $(TARGET).elf $@
+	$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@
 
 %.eep: %.elf
 	@echo
@@ -149,10 +162,35 @@ read-fuse:
 	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@
 
-%.elf:
+%.lss: %.elf
+	@echo
+	@echo $(MSG_EXTENDED_LISTING) $@
+	$(OBJDUMP) -h -S $< > $@
+
+%.sym: %.elf
+	@echo
+	@echo $(MSG_SYMBOL_TABLE) $@
+	avr-nm -n $< > $@
+
+.SECONDARY : $(TARGET).elf
+.PRECIOUS : $(OBJ)
+%.elf: $(OBJ)
 	@echo
 	@echo $(MSG_LINKING) $@
-	$(CC) $(SRC) $(ALL_CFLAGS) -o $@ $(LDFLAGS)
+	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+
+%.o : %.c
+	@echo
+	@echo $(MSG_COMPILING) $<
+	$(CC) -c $(ALL_CFLAGS) $< -o $@
+
+%.s : %.c
+	$(CC) -S $(ALL_CFLAGS) $< -o $@
+
+%.o : %.S
+	@echo
+	@echo $(MSG_ASSEMBLING) $<
+	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 clean: begin clean_list finished end
 
@@ -161,7 +199,26 @@ clean_list :
 	@echo $(MSG_CLEANING)
 	$(REMOVE) $(TARGET).hex
 	$(REMOVE) $(TARGET).eep
+	$(REMOVE) $(TARGET).obj
+	$(REMOVE) $(TARGET).cof
 	$(REMOVE) $(TARGET).elf
+	$(REMOVE) $(TARGET).map
+	$(REMOVE) $(TARGET).obj
+	$(REMOVE) $(TARGET).a90
+	$(REMOVE) $(TARGET).sym
+	$(REMOVE) $(TARGET).lnk
+	$(REMOVE) $(TARGET).lss
+	$(REMOVE) $(OBJ)
+	$(REMOVE) $(LST)
+	$(REMOVE) $(SRC:.c=.s)
+	$(REMOVE) $(SRC:.c=.d)
+
+%.d: %.c
+	set -e; $(CC) -MM $(ALL_CFLAGS) $< \
+	| sed 's,\(.*\)\.o[ :]*,\1.o \1.d : ,g' > $@; \
+	[ -s $@ ] || rm -f $@
+
+-include $(SRC:.c=.d)
 
 .PHONY : all begin finish end sizebefore sizeafter gccversion coff extcoff \
 	clean clean_list program
