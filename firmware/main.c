@@ -9,7 +9,7 @@ based on the code of :
 * Damien Good
 * Furrtek
 
-distributed under Creative Commons 2.5 -- Attib & Share Alike
+Distributed under Creative Commons 2.5 -- Attib & Share Alike
 */
 
 #include <avr/io.h>
@@ -26,6 +26,7 @@ extern const PGM_P * const EUpowerCodes[] PROGMEM;
 extern const uint8_t num_EUcodes;
 */
 
+// A global variable caught by interrupt
 volatile unsigned short working = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
@@ -77,7 +78,7 @@ int main(void) {
 	// Set up a pullup on the pin which is connected to the button
 	PORTB = _BV(BUTTON);
 
-// 	delay_ten_us(6000);// TODO : useful ?
+	// delay_ten_us(6000);// TODO : useful ?
 
 	// Set an interrupt on INT0 (which is PB2)
 	GIMSK = _BV(INT0);
@@ -149,7 +150,7 @@ int main(void) {
 			// visible indication that a code has been output.
 			blinkLED(1);
 		}
-		// My job is done, fuck you all
+		// "My job is done, fuck you all"
 		working = 0;
 
 		// We are done, no need for a watchdog timer anymore
