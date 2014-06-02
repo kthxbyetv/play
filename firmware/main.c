@@ -12,21 +12,14 @@ based on the code of :
 Distributed under Creative Commons 2.5 -- Attib & Share Alike
 */
 
-#include <avr/io.h>
 #include <avr/sleep.h>
-#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include "hardware.h"
 #include "utils.c"
 #include "codes.c"
 
-/* No use, because we include codes.c, because of the new makefile
-extern const PGM_P * const EUpowerCodes[] PROGMEM;
-extern const uint8_t num_EUcodes;
-*/
-
-// A global variable caught by interrupt
+// A global variable caught by the interrupt
 volatile unsigned short working = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
@@ -83,11 +76,6 @@ int main(void) {
 	// Set an interrupt on INT0 (which is PB2)
 	GIMSK = _BV(INT0);
 
-	/* Moved into the loop
-	// Turn on the watchdog with a 1 second long timeout
-	wdt_enable(WDTO_8S);
-	*/
-
 	// Turn on interrupts
 	sei();
 
@@ -95,7 +83,7 @@ int main(void) {
 		// Turn on the watchdog with a 1 second long timeout
 		wdt_enable(WDTO_8S);
 
-		// We start working, so let's define the variable
+		// We start working, so let's modify the variable
 		working = 1;
 
 		for(i = 0; i < num_EUcodes; i++) {
@@ -164,14 +152,6 @@ int main(void) {
 
 		// Make sure our watchdog is disabled
 		wdt_disable();
-
-		/* CHECK : Is this really necessary ? It's already defined at the beginning of main
-		// Setting the pullup on the button
-		PORTB = _BV(BUTTON);
-
-		// Set an interrupt on INT0 (which is PB2)
-		GIMSK = _BV(INT0);
-		*/
 
 		// Put the CPU into sleep mode
 		MCUCR = _BV(SM1) | _BV(SE);
