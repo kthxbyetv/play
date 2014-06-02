@@ -133,7 +133,7 @@ int main(void) {
 			bitsleft_r = 0;
 
 			// delay 250 milliseconds before transmitting next POWER code
-			delay_ten_us(25000);// TODO : decrease this number to accelerate the process ?
+			delay_ten_us(25000);
 
 			// visible indication that a code has been output.
 			blinkLED(1);
@@ -145,7 +145,7 @@ int main(void) {
 		wdt_disable();
 
 		// flash the visible LED on PB0 4 times to indicate that we're done
-		blinkLED(5);
+		blinkLED(4);
 
 		// Shut down the timer
 		TCCR0A = 0;
