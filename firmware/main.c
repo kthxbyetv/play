@@ -20,7 +20,7 @@ Distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include "codes.c"
 
 // A global variable caught by the interrupt
-volatile unsigned short working = 0;
+volatile short click = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
 	uint8_t i, tmp = 0;
@@ -48,8 +48,8 @@ uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *co
 }
 
 ISR(INT0_vect) {
-	// Set working to 0, so it will break the loop and sleep the chip
-	working = 0;
+	// Increment click to count the number of clicks
+	click++;
 }
 
 int main(void) {
@@ -77,21 +77,22 @@ int main(void) {
 	// Turn on interrupts
 	sei();
 
-	delay_ten_us(5000);
-
 	for(;;) {
+		// A little delay, otherwise it won't work and the CPU will return in sleep mode immediately
+		delay_ten_us(5000);
+
 		// Turn on the watchdog with a 1 second long timeout
 		wdt_enable(WDTO_8S);
 
 		// We start working, so let's modify the variable
-		working = 1;
+		click = 0;
 
 		for(i = 0; i < num_EUcodes; i++) {
 			// Reset our watchdog timer, so it won't reset the AVR while sending a code
 			wdt_reset();
 
 			// Check the interrupt
-			if(working == 0)
+			if(click != 0)
 				break;
 
 			// Getting the address of our code
@@ -138,14 +139,9 @@ int main(void) {
 			// visible indication that a code has been output.
 			blinkLED(1);
 		}
-		// "My job is done, fuck you all"
-		working = 0;
 
 		// We are done, no need for a watchdog timer anymore
 		wdt_disable();
-
-		// flash the visible LED on PB0 4 times to indicate that we're done
-		blinkLED(4);
 
 		// Shut down the timer
 		TCCR0A = 0;
@@ -153,20 +149,14 @@ int main(void) {
 		// Make sure our watchdog is disabled
 		wdt_disable();
 
-		// Put the CPU into sleep mode
-		MCUCR = _BV(SM1) | _BV(SE);
-		sleep_cpu();
+		// If we clicked two times or zero time
+		if(click < 2) {
+			// Flash the visible LED on PB0 4 times to indicate that we're done
+			blinkLED(4);
 
-		// A little delay, otherwise it won't work and the CPU will return in sleep mode immediately
-		delay_ten_us(5000);
-
-		/* Instead of reseting, why not looping again ?
-		// Reset the AVR when it wakes up
-		// To reset the AVR without relying on hardware,
-		// we enable the watchdog then launch an endless loop
-		// so that the watchdog will detect it and reset the AVR
-		wdt_enable(WDTO_15MS);
-		for(;;) {}
-		*/
+			// Put the CPU into sleep mode
+			MCUCR = _BV(SM1) | _BV(SE);
+			sleep_cpu();
+		} // Otherwise, we do another cycle
 	}
 }
