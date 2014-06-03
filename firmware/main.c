@@ -19,8 +19,8 @@ Distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include "utils.c"
 #include "codes.c"
 
-// We want to count the number of clicks on the button
-volatile char clicks = 0;
+// A global variable caught by the interrupt
+volatile char working = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
 	uint8_t i, tmp = 0;
@@ -48,12 +48,9 @@ uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *co
 }
 
 ISR(INT0_vect) {
-	// The button is pressed, we count one click more
-	clicks++;
-
-	// To debounce, we wait a little.
-	// When there will be bounces, the interrupt will wait and not increment
-	delay_ten_us(25000);
+	// Set working to 0, so it will break the loop and sleep the chip
+	// This interrupt is also used to awake the chip.
+	working = 0;
 }
 
 int main(void) {
@@ -88,16 +85,20 @@ int main(void) {
 		// Turn on the watchdog with a 1 second long timeout
 		wdt_enable(WDTO_8S);
 
-		// Clear the clicks counter
-		clicks = 0;
+		// We start working, so let's modify the variable
+		working = 1;
 
 		for(i = 0; i < NUM_ELEM(powerCodes); i++) {
 			// Check the interrupt
-			if(clicks != 0)
+			if(working == 0)
 				break;
 
 			// Reset our watchdog timer, so it won't reset the AVR while sending a code
 			wdt_reset();
+
+			// Flush remaining bits, so that the code starts
+			// with a fresh set of 8 bits. That's a lot of bites.
+			bitsleft_r = 0;
 
 			// Getting the address of our code
 			code_ptr = (PGM_P)pgm_read_word(powerCodes+i);
@@ -117,10 +118,6 @@ int main(void) {
 			// Get pointer (address in memory) to pulse-times table
 			const PGM_P time_ptr = (PGM_P)pgm_read_word(code_ptr);
 			code_ptr += 2;
-
-			// Flush remaining bits, so that the code starts
-			// with a fresh set of 8 bits. That's a lot of bites.
-			bitsleft_r = 0;
 
 			for(k = 0; k < numpairs; k++) {
 				// Read the next 'n' bits as indicated by the compression variable
@@ -146,15 +143,11 @@ int main(void) {
 		// We are done, no need for a watchdog timer anymore
 		wdt_disable();
 
-		// If we pressed the button one time, we reset, otherwise we enter into sleep mode
-		if(clicks != 1) {
-			// Flash the visible LED on PB0 4 times to indicate that we're done
-			blinkLED(4);
+		// Flash the visible LED on PB0 4 times to indicate that we're done
+		blinkLED(4);
 
-			// Put the CPU into sleep mode
-			MCUCR = _BV(SM1) | _BV(SE);
-			sleep_cpu();
-		}
-		// The clicks counter is reseted at the beginning of the loop
+		// Put the CPU into sleep mode
+		MCUCR = _BV(SM1) | _BV(SE);
+		sleep_cpu();
 	}
 }
