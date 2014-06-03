@@ -81,6 +81,7 @@ begin:
 	@echo $(MSG_BEGIN)
 
 finished:
+	@echo
 	@echo $(MSG_ERRORS_NONE)
 
 end:
@@ -89,6 +90,7 @@ end:
 
 # Display compiler version information.
 gccversion :
+	@echo
 	@$(CC) --version
 
 # Convert ELF to COFF for use in debugging / simulating in
@@ -127,20 +129,20 @@ read-fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U hfuse:r:h.txt:r
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U efuse:r:e.txt:r
 
+%.elf: $(SRC)
+	@echo
+	@echo $(MSG_LINKING) $@
+	$(CC) -o $@ -c $< $(ALL_CFLAGS) $(LDFLAGS)
+
 %.hex: %.elf
 	@echo
 	@echo $(MSG_FLASH) $@
-	$(OBJCOPY) -O $(FORMAT) $(TARGET).elf $@
+	$(OBJCOPY) -O $(FORMAT) $< $@
 
 %.eep: %.elf
 	@echo
 	@echo $(MSG_EEPROM) $@
 	$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O $(FORMAT) $< $@
-
-%.elf:
-	@echo
-	@echo $(MSG_LINKING) $@
-	$(CC) $(SRC) $(ALL_CFLAGS) -o $@ $(LDFLAGS)
 
 clean: begin clean_list finished end
 
