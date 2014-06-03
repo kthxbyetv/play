@@ -29,15 +29,6 @@ AVRDUDE_PORT = usb        # programmer connected to serial device
 AVRDUDE_WRITE_FLASH = -B 1 -U flash:w:$(TARGET).hex
 AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
 
-# Define directories, if needed.
-DIRAVR = c:/winavr
-DIRAVRBIN = $(DIRAVR)/bin
-DIRAVRUTILS = $(DIRAVR)/utils/bin
-DIRINC = .
-DIRLIB = $(DIRAVR)/avr/lib
-
-
-# Define programs and commands.
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 
@@ -45,25 +36,14 @@ OBJCOPY = avr-objcopy
 AVRDUDE = avrdude
 
 REMOVE = rm -f
-COPY = cp
-
-HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
-ELFSIZE = $(SIZE) -A $(TARGET).elf
 
 # Define Messages
 # English
 MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = -------- begin --------
 MSG_END = --------  end  --------
-MSG_COFF = Converting to AVR COFF:
-MSG_EXTENDED_COFF = Converting to AVR Extended COFF:
 MSG_FLASH = Creating load file for Flash:
-MSG_EEPROM = Creating load file for EEPROM:
-MSG_EXTENDED_LISTING = Creating Extended Listing:
-MSG_SYMBOL_TABLE = Creating Symbol Table:
-MSG_LINKING = Linking:
 MSG_COMPILING = Compiling:
-MSG_ASSEMBLING = Assembling:
 MSG_CLEANING = Cleaning project:
 
 # Combine all necessary flags and optional flags.
@@ -71,7 +51,7 @@ MSG_CLEANING = Cleaning project:
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS)
 
 # Default target.
-all: begin clean_list gccversion $(TARGET).elf $(TARGET).hex $(TARGET).eep finished end
+all: begin clean_list gccversion $(TARGET).elf $(TARGET).hex finished end
 
 # Eye candy.
 # AVR Studio 3.x does not check make's exit code but relies on
@@ -93,56 +73,25 @@ gccversion :
 	@echo
 	@$(CC) --version
 
-# Convert ELF to COFF for use in debugging / simulating in
-# AVR Studio or VMLAB.
-COFFCONVERT=$(OBJCOPY) --debugging \
-	--change-section-address .data-0x800000 \
-	--change-section-address .bss-0x800000 \
-	--change-section-address .noinit-0x800000 \
-	--change-section-address .eeprom-0x810000
-
-coff: $(TARGET).elf
-	@echo
-	@echo $(MSG_COFF) $(TARGET).cof
-	$(COFFCONVERT) -O coff-avr $< $(TARGET).cof
-
-extcoff: $(TARGET).elf
-	@echo
-	@echo $(MSG_EXTENDED_COFF) $(TARGET).cof
-	$(COFFCONVERT) -O coff-ext-avr $< $(TARGET).cof
-
-reset:
-	$(AVRDUDE) $(AVRDUDE_FLAGS)
-
-program: $(TARGET).hex $(TARGET).eep
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
+program: $(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 full: $(TARGET).hex
 	make burn-fuse
 	make program
 
 burn-fuse:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 250 -u -U lfuse:w:0xfd:m -U hfuse:w:0xdf:m
-
-read-fuse:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U lfuse:r:l.txt:r
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U hfuse:r:h.txt:r
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -u -U efuse:r:e.txt:r
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:0xe2:m -U hfuse:w:0xde:m -U efuse:w:0xff:m
 
 %.elf: $(SRC)
 	@echo
-	@echo $(MSG_LINKING) $@
-	$(CC) -o $@ -c $< $(ALL_CFLAGS) $(LDFLAGS)
+	@echo $(MSG_COMPILING) $@
+	$(CC) $< -o $@ $(ALL_CFLAGS) $(LDFLAGS)
 
 %.hex: %.elf
 	@echo
 	@echo $(MSG_FLASH) $@
 	$(OBJCOPY) -O $(FORMAT) $< $@
-
-%.eep: %.elf
-	@echo
-	@echo $(MSG_EEPROM) $@
-	$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O $(FORMAT) $< $@
 
 clean: begin clean_list finished end
 
@@ -150,7 +99,6 @@ clean_list :
 	@echo
 	@echo $(MSG_CLEANING)
 	$(REMOVE) $(TARGET).hex
-	$(REMOVE) $(TARGET).eep
 	$(REMOVE) $(TARGET).elf
 
-.PHONY : all begin finish end gccversion coff extcoff clean clean_list program
+.PHONY : all begin finish end gccversion clean clean_list program
