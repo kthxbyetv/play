@@ -20,7 +20,7 @@ Distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include "codes.c"
 
 // A global variable caught by the interrupt
-volatile short click = 0;
+volatile unsigned short working = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
 	uint8_t i, tmp = 0;
@@ -48,8 +48,8 @@ uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *co
 }
 
 ISR(INT0_vect) {
-	// Increment click to count the number of clicks
-	click++;
+	// Set working to 0, so it will break the loop and sleep the chip
+	working = 0;
 }
 
 int main(void) {
@@ -85,14 +85,14 @@ int main(void) {
 		wdt_enable(WDTO_8S);
 
 		// We start working, so let's modify the variable
-		click = 0;
+		working = 1;
 
 		for(i = 0; i < num_EUcodes; i++) {
 			// Reset our watchdog timer, so it won't reset the AVR while sending a code
 			wdt_reset();
 
 			// Check the interrupt
-			if(click != 0)
+			if(working == 0)
 				break;
 
 			// Getting the address of our code
@@ -139,24 +139,17 @@ int main(void) {
 			// visible indication that a code has been output.
 			blinkLED(1);
 		}
-
 		// We are done, no need for a watchdog timer anymore
 		wdt_disable();
 
 		// Shut down the timer
 		TCCR0A = 0;
 
-		// Make sure our watchdog is disabled
-		wdt_disable();
+		// Flash the visible LED on PB0 4 times to indicate that we're done
+		blinkLED(4);
 
-		// If we clicked two times or zero time
-		if(click < 2) {
-			// Flash the visible LED on PB0 4 times to indicate that we're done
-			blinkLED(4);
-
-			// Put the CPU into sleep mode
-			MCUCR = _BV(SM1) | _BV(SE);
-			sleep_cpu();
-		} // Otherwise, we do another cycle
+		// Put the CPU into sleep mode
+		MCUCR = _BV(SM1) | _BV(SE);
+		sleep_cpu();
 	}
 }
