@@ -1368,7 +1368,7 @@ const struct IrCode code_eu059Code PROGMEM = {
 	}
 };
 
-const struct IrCode * const EUpowerCodes[] PROGMEM = {
+const struct IrCode * const powerCodes[] PROGMEM = {
 	&code_eu000Code,
 	&code_epsonCode,// Two times, because the projector shows a confirmation message
 	&code_HitachiVPCode,
@@ -1441,5 +1441,3 @@ const struct IrCode * const EUpowerCodes[] PROGMEM = {
 	&code_eu058Code,
 	&code_eu059Code
 };
-
-const uint8_t num_EUcodes = NUM_ELEM(EUpowerCodes);

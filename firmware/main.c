@@ -20,7 +20,7 @@ Distributed under Creative Commons 2.5 -- Attib & Share Alike
 #include "codes.c"
 
 // A global variable caught by the interrupt
-volatile unsigned short working = 0;
+volatile char working = 0;
 
 uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *code_ptr) {
 	uint8_t i, tmp = 0;
@@ -49,6 +49,7 @@ uint8_t read_bits(uint8_t count, uint8_t *bitsleft_r, uint8_t *bits_r, PGM_P *co
 
 ISR(INT0_vect) {
 	// Set working to 0, so it will break the loop and sleep the chip
+	// This interrupt is also used to awake the chip.
 	working = 0;
 }
 
@@ -57,10 +58,10 @@ int main(void) {
 	uint16_t ontime, offtime;
 	uint8_t i, k, ti,
 	// Such buffers
-	bitsleft_r = 0, bits_r = 0;
+	bitsleft_r, bits_r;
 	PGM_P code_ptr;
 
-	// Clearing watchdogs flags and disabling it
+	// Clearing watchdog's flags and disabling it
 	MCUSR = 0;
 	WDTCR = _BV(WDCE) | _BV(WDE);
 	WDTCR = 0;
@@ -87,16 +88,20 @@ int main(void) {
 		// We start working, so let's modify the variable
 		working = 1;
 
-		for(i = 0; i < num_EUcodes; i++) {
-			// Reset our watchdog timer, so it won't reset the AVR while sending a code
-			wdt_reset();
-
+		for(i = 0; i < NUM_ELEM(powerCodes); i++) {
 			// Check the interrupt
 			if(working == 0)
 				break;
 
+			// Reset our watchdog timer, so it won't reset the AVR while sending a code
+			wdt_reset();
+
+			// Flush remaining bits, so that the code starts
+			// with a fresh set of 8 bits. That's a lot of bites.
+			bitsleft_r = 0;
+
 			// Getting the address of our code
-			code_ptr = (PGM_P)pgm_read_word(EUpowerCodes+i);
+			code_ptr = (PGM_P)pgm_read_word(powerCodes+i);
 
 			// Read the carrier frequency
 			const uint8_t freq = pgm_read_byte(code_ptr++);
@@ -118,7 +123,7 @@ int main(void) {
 				// Read the next 'n' bits as indicated by the compression variable
 				// The multiply by 4 because there are 2 timing numbers per pair
 				// and each timing number is one word long, so 4 bytes total!
-				// Pointer > global, bitch
+				// Pointers > globals, bitch
 				ti = (read_bits(bitcompression, &bitsleft_r, &bits_r, &code_ptr)) * 4;
 
 				// read the onTime and offTime from the program memory
@@ -129,21 +134,14 @@ int main(void) {
 				xmitCodeElement(ontime, offtime, (freq != 0));
 			}
 
-			// Flush remaining bits, so that next code starts
-			// with a fresh set of 8 bits. That's a lot of bites.
-			bitsleft_r = 0;
-
-			// delay 250 milliseconds before transmitting next POWER code
-			delay_ten_us(25000);
-
-			// visible indication that a code has been output.
+			// Visible indication that a code has been output.
 			blinkLED(1);
+
+			// Delay 250 milliseconds before transmitting next POWER code
+			delay_ten_us(25000);
 		}
 		// We are done, no need for a watchdog timer anymore
 		wdt_disable();
-
-		// Shut down the timer
-		TCCR0A = 0;
 
 		// Flash the visible LED on PB0 4 times to indicate that we're done
 		blinkLED(4);
