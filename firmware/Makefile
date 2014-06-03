@@ -75,7 +75,7 @@ MSG_CLEANING = Cleaning project:
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS)
 
 # Default target.
-all: begin gccversion sizebefore $(TARGET).elf $(TARGET).hex sizeafter finished end
+all: begin gccversion sizebefore clean $(TARGET).elf $(TARGET).hex sizeafter finished end
 
 # Eye candy.
 # AVR Studio 3.x does not check make's exit code but relies on

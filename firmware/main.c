@@ -71,13 +71,13 @@ int main(void) {
 	// Set up a pullup on the pin which is connected to the button
 	PORTB = _BV(BUTTON);
 
-	// delay_ten_us(6000);// TODO : useful ?
-
 	// Set an interrupt on INT0 (which is PB2)
 	GIMSK = _BV(INT0);
 
 	// Turn on interrupts
 	sei();
+
+	delay_ten_us(5000);
 
 	for(;;) {
 		// Turn on the watchdog with a 1 second long timeout
