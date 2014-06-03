@@ -38,10 +38,8 @@ DIRLIB = $(DIRAVR)/avr/lib
 
 
 # Define programs and commands.
-SHELL = sh
 CC = avr-gcc
 OBJCOPY = avr-objcopy
-SIZE = avr-size
 
 # Programming support using avrdude.
 AVRDUDE = avrdude
@@ -57,8 +55,6 @@ ELFSIZE = $(SIZE) -A $(TARGET).elf
 MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = -------- begin --------
 MSG_END = --------  end  --------
-MSG_SIZE_BEFORE = Size before:
-MSG_SIZE_AFTER = Size after:
 MSG_COFF = Converting to AVR COFF:
 MSG_EXTENDED_COFF = Converting to AVR Extended COFF:
 MSG_FLASH = Creating load file for Flash:
@@ -75,7 +71,7 @@ MSG_CLEANING = Cleaning project:
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS)
 
 # Default target.
-all: begin gccversion sizebefore clean $(TARGET).elf $(TARGET).hex sizeafter finished end
+all: begin clean_list gccversion $(TARGET).elf $(TARGET).hex $(TARGET).eep finished end
 
 # Eye candy.
 # AVR Studio 3.x does not check make's exit code but relies on
@@ -90,13 +86,6 @@ finished:
 end:
 	@echo $(MSG_END)
 	@echo
-
-# Display size of file.
-sizebefore:
-	@if [ -f $(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
-
-sizeafter:
-	@if [ -f $(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
 
 # Display compiler version information.
 gccversion :
@@ -146,8 +135,7 @@ read-fuse:
 %.eep: %.elf
 	@echo
 	@echo $(MSG_EEPROM) $@
-	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
-	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@
+	$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O $(FORMAT) $< $@
 
 %.elf:
 	@echo
@@ -163,5 +151,4 @@ clean_list :
 	$(REMOVE) $(TARGET).eep
 	$(REMOVE) $(TARGET).elf
 
-.PHONY : all begin finish end sizebefore sizeafter gccversion coff extcoff \
-	clean clean_list program
+.PHONY : all begin finish end gccversion coff extcoff clean clean_list program
