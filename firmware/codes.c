@@ -1369,11 +1369,11 @@ const struct IrCode code_eu059Code PROGMEM = {
 };
 
 const struct IrCode * const EUpowerCodes[] PROGMEM = {
-	&code_epsonCode,// Two times, because the projector shows a confirmation message
 	&code_eu000Code,
+	&code_epsonCode,// Two times, because the projector shows a confirmation message
 	&code_HitachiVPCode,
-	&code_epsonCode,
 	&code_TNT1Code,
+	&code_epsonCode,
 	&code_eu001Code,
 	&code_eu002Code,
 	&code_na000Code,
